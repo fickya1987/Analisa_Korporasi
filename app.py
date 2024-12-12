@@ -21,8 +21,8 @@ def preprocess_data(df):
         .str.replace(' ', '_')
         .str.replace(r'unnamed:_\d+', 'unknown_column', regex=True)
     )
-    # Menangani nama kolom duplikat dengan menambahkan suffix jika duplikat ditemukan
-    df.columns = pd.io.parsers.ParserBase({'names': df.columns})._maybe_dedup_names(df.columns)
+    # Menangani nama kolom duplikat
+    df.columns = pd.io.common.make_unique(df.columns)
     # Penanganan nilai kosong
     df = df.fillna(0)
     return df
