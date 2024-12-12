@@ -16,7 +16,7 @@ st.write("Aplikasi ini menyediakan wawasan dan alat untuk proses integrasi pasca
 # Fungsi untuk pre-processing data
 def preprocess_data(df):
     # Normalisasi nama kolom
-    df.columns = df.columns.str.lower().str.replace(' ', '_')
+    df.columns = df.columns.str.lower().str.replace(' ', '_').str.replace('unnamed:_\d+', 'unknown_column', regex=True)
     # Penanganan nilai kosong
     df = df.fillna(0)
     return df
@@ -118,12 +118,12 @@ if uploaded_file:
             with st.spinner("GPT-4o sedang menganalisis data..."):
                 try:
                     response = openai.ChatCompletion.create(
-                        model="gpt-4",
+                        model="gpt-4o",
                         messages=[
                             {"role": "system", "content": "Anda adalah asisten yang menganalisis data."},
                             {"role": "user", "content": f"Analisis dataset berikut:\n{df.head(10).to_string()}\n\n{prompt}"}
                         ],
-                        max_tokens=500
+                        max_tokens=2048
                     )
                     st.write(response['choices'][0]['message']['content'])
                 except Exception as e:
@@ -132,5 +132,3 @@ if uploaded_file:
         st.info("Masukkan API Key OpenAI Anda di file .env untuk mengaktifkan analisis GPT-4o.")
 else:
     st.warning("Harap unggah file untuk memulai.")
-
-
