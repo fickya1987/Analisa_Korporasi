@@ -16,7 +16,13 @@ st.write("Aplikasi ini menyediakan wawasan dan alat untuk proses integrasi pasca
 # Fungsi untuk pre-processing data
 def preprocess_data(df):
     # Normalisasi nama kolom
-    df.columns = df.columns.str.lower().str.replace(' ', '_').str.replace('unnamed:_\d+', 'unknown_column', regex=True)
+    df.columns = (
+        df.columns.str.lower()
+        .str.replace(' ', '_')
+        .str.replace('unnamed:_\d+', 'unknown_column', regex=True)
+    )
+    # Menangani kolom duplikat
+    df.columns = pd.io.parsers.ParserBase({'names': df.columns})._maybe_dedup_names(df.columns)
     # Penanganan nilai kosong
     df = df.fillna(0)
     return df
@@ -118,12 +124,12 @@ if uploaded_file:
             with st.spinner("GPT-4o sedang menganalisis data..."):
                 try:
                     response = openai.ChatCompletion.create(
-                        model="gpt-4o",
+                        model="gpt-4",
                         messages=[
                             {"role": "system", "content": "Anda adalah asisten yang menganalisis data."},
                             {"role": "user", "content": f"Analisis dataset berikut:\n{df.head(10).to_string()}\n\n{prompt}"}
                         ],
-                        max_tokens=2048
+                        max_tokens=500
                     )
                     st.write(response['choices'][0]['message']['content'])
                 except Exception as e:
