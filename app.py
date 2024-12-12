@@ -19,10 +19,11 @@ def preprocess_data(df):
     df.columns = (
         df.columns.str.lower()
         .str.replace(' ', '_')
-        .str.replace('unnamed:_\d+', 'unknown_column', regex=True)
+        .str.replace(r'unnamed:_\d+', 'unknown_column', regex=True)
     )
-    # Menangani kolom duplikat dengan menambahkan suffix
-    df.columns = pd.io.common._maybe_dedup_names(df.columns)
+    # Menangani nama kolom duplikat
+    df.columns = pd.Series(df.columns).apply(lambda x: f"{x}_{df.columns.tolist().count(x)-1}" 
+                                             if df.columns.tolist().count(x) > 1 else x)
     # Penanganan nilai kosong
     df = df.fillna(0)
     return df
