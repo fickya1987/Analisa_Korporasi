@@ -21,8 +21,8 @@ def preprocess_data(df):
         .str.replace(' ', '_')
         .str.replace('unnamed:_\d+', 'unknown_column', regex=True)
     )
-    # Menangani kolom duplikat
-    df.columns = pd.io.parsers.ParserBase({'names': df.columns})._maybe_dedup_names(df.columns)
+    # Menangani kolom duplikat dengan menambahkan suffix
+    df.columns = pd.io.common._maybe_dedup_names(df.columns)
     # Penanganan nilai kosong
     df = df.fillna(0)
     return df
@@ -138,3 +138,4 @@ if uploaded_file:
         st.info("Masukkan API Key OpenAI Anda di file .env untuk mengaktifkan analisis GPT-4o.")
 else:
     st.warning("Harap unggah file untuk memulai.")
+
