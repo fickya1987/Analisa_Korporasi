@@ -13,6 +13,14 @@ load_dotenv()
 st.title("Dasbor Integrasi Pasca-Merger Pelindo")
 st.write("Aplikasi ini menyediakan wawasan dan alat untuk proses integrasi pasca-merger Pelindo.")
 
+# Fungsi untuk pre-processing data
+def preprocess_data(df):
+    # Normalisasi nama kolom
+    df.columns = df.columns.str.lower().str.replace(' ', '_')
+    # Penanganan nilai kosong
+    df = df.fillna(0)
+    return df
+
 # Upload file oleh pengguna
 uploaded_file = st.file_uploader("Unggah file Excel atau CSV Anda", type=["xlsx", "csv"])
 
@@ -26,33 +34,36 @@ if uploaded_file:
         df = pd.read_csv(uploaded_file)
         sheet = "CSV File"
 
+    # Pre-processing data
+    df = preprocess_data(df)
+
     # Tampilkan data
     st.subheader(f"Data dari {sheet}")
     st.dataframe(df)
 
     # Analisis khusus berdasarkan pilihan sheet
-    if sheet == "Daftar IS & AK":
+    if sheet == "daftar_is_&_ak":
         st.subheader("Analisis Inisiatif Strategis dan Aksi Kunci")
         st.write("Menganalisis hubungan dan prioritas antara IS dan AK.")
-        if "Priority" in df.columns:
+        if "priority" in df.columns:
             st.write("Prioritas Utama:")
-            st.write(df[df["Priority"] == "High"])
+            st.write(df[df["priority"] == "High"])
 
-    elif sheet == "Evaluasi Target":
+    elif sheet == "evaluasi_target":
         st.subheader("Evaluasi Target")
         st.write("Ikhtisar pencapaian target dan kesenjangan.")
-        if "Achievement" in df.columns and "Target" in df.columns:
-            df['Gap'] = df['Target'] - df['Achievement']
+        if "achievement" in df.columns and "target" in df.columns:
+            df['gap'] = df['target'] - df['achievement']
             st.write("Kesenjangan Kinerja:")
-            st.dataframe(df[['Target', 'Achievement', 'Gap']])
+            st.dataframe(df[['target', 'achievement', 'gap']])
             # Visualisasi lanjutan
             st.write("Distribusi Kesenjangan:")
             fig, ax = plt.subplots()
-            sns.histplot(df['Gap'], kde=True, ax=ax)
+            sns.histplot(df['gap'], kde=True, ax=ax)
             ax.set_title("Distribusi Kesenjangan Kinerja")
             st.pyplot(fig)
 
-    elif "Dashboard" in sheet:
+    elif "dashboard" in sheet:
         st.subheader(f"Analisis {sheet}")
         st.write("Visualisasi metrik utama dan tren.")
         numeric_data = df.select_dtypes(include=['float', 'int'])
@@ -67,19 +78,19 @@ if uploaded_file:
         else:
             st.write("Tidak ada data numerik yang tersedia untuk visualisasi.")
 
-    elif sheet == "Tracking VC":
+    elif sheet == "tracking_vc":
         st.subheader("Pelacakan Penciptaan Nilai")
         st.write("Memantau kemajuan dan mengidentifikasi hambatan.")
-        if "Progress" in df.columns:
-            avg_progress = df["Progress"].mean()
+        if "progress" in df.columns:
+            avg_progress = df["progress"].mean()
             st.metric("Rata-rata Kemajuan", f"{avg_progress:.2f}%")
             st.write("Distribusi Kemajuan:")
             fig, ax = plt.subplots()
-            sns.boxplot(x=df['Progress'], ax=ax)
+            sns.boxplot(x=df['progress'], ax=ax)
             ax.set_title("Distribusi Kemajuan")
             st.pyplot(fig)
 
-    elif sheet in ["RKM 2", "HO", "SPTP", "SPMT", "SPSL", "SPJM"]:
+    elif sheet in ["rkm_2", "ho", "sptp", "spmt", "spsl", "spjm"]:
         st.subheader(f"Wawasan Operasional untuk {sheet}")
         st.write("Menganalisis data operasional dan mengidentifikasi area untuk perbaikan.")
         st.write("Statistik Ringkasan:")
@@ -93,7 +104,7 @@ if uploaded_file:
             ax.set_title(f"Distribusi Data Numerik untuk {sheet}")
             st.pyplot(fig)
 
-    elif sheet == "99 Ref":
+    elif sheet == "99_ref":
         st.subheader("Analisis Data Referensi")
         st.write("Detail dan wawasan dari data referensi.")
         st.write(df)
@@ -121,4 +132,5 @@ if uploaded_file:
         st.info("Masukkan API Key OpenAI Anda di file .env untuk mengaktifkan analisis GPT-4o.")
 else:
     st.warning("Harap unggah file untuk memulai.")
+
 
