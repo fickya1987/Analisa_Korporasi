@@ -121,20 +121,20 @@ if uploaded_file:
         st.write(df)
 
     # Integrasi GPT-4o
-    st.subheader("Analisis AI (GPT-4o)")
+    st.subheader("Analisis Pelindo AI")
     if os.getenv("OPENAI_API_KEY"):
         openai.api_key = os.getenv("OPENAI_API_KEY")
         prompt = st.text_area("Ajukan pertanyaan kepada GPT-4o tentang data ini", "Apa wawasan yang bisa Anda berikan tentang dataset ini?")
         if st.button("Analisis"):
-            with st.spinner("GPT-4o sedang menganalisis data..."):
+            with st.spinner("Pelindo AI sedang menganalisis data..."):
                 try:
                     response = openai.ChatCompletion.create(
-                        model="gpt-4",
+                        model="gpt-4o",
                         messages=[
                             {"role": "system", "content": "Anda adalah asisten yang menganalisis data."},
                             {"role": "user", "content": f"Analisis dataset berikut:\n{df.head(10).to_string()}\n\n{prompt}"}
                         ],
-                        max_tokens=500
+                        max_tokens=2048
                     )
                     st.write(response['choices'][0]['message']['content'])
                 except Exception as e:
