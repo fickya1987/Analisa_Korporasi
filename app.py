@@ -21,8 +21,13 @@ def preprocess_data(df):
         .str.replace(' ', '_')
         .str.replace(r'unnamed:_\d+', 'unknown_column', regex=True)
     )
-    # Menangani nama kolom duplikat
-    df.columns = pd.io.common.make_unique(df.columns)
+    # Menangani nama kolom duplikat secara manual
+    cols = pd.Series(df.columns)
+    for dup in cols[cols.duplicated()].unique():
+        cols[cols[cols == dup].index.values.tolist()] = [
+            f"{dup}_{i}" if i != 0 else dup for i in range(sum(cols == dup))
+        ]
+    df.columns = cols
     # Penanganan nilai kosong
     df = df.fillna(0)
     return df
